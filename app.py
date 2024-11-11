@@ -31,7 +31,7 @@ class App(tk.Tk):
     def show_frame(self, page_name):
         frame = self.frames[page_name]
         if page_name == "SecondScreen":
-            frame.update_label()  # Update the label text when showing SecondScreen
+            frame.update_label()  
         frame.tkraise()
     
     def on_close(self):
@@ -159,8 +159,44 @@ class SecondScreen(tk.Frame):
     def crack_time(self):
         global curr_password
         guess, elapsed_time = self.crack.brute_force(curr_password)
-        print(f"Password cracked: {guess} in {elapsed_time} seconds")
-        messagebox.showinfo("Crack Time", f"Password cracked: {guess} in {elapsed_time} seconds")
+
+        if guess is None:
+            print(f"Password not cracked in 30 seconds")
+            response = messagebox.askquestion("Crack Time", f"Password not brute forced in 30 seconds! Run Dictionary Attack?")
+
+            if response == 'yes':
+                self.dictionary_attack()
+            else:
+                print("Crack Time expired")
+        else:
+            print(f"Password cracked: {guess} in {elapsed_time} seconds")
+            response = messagebox.askquestion("Crack Time", f"Password cracked: {guess} in {elapsed_time} seconds, Run Dictionary Attack?")
+
+            if response == 'yes':
+                self.dictionary_attack()
+            else:
+                print("Crack Time expired")
+
+    def dictionary_attack(self):
+        global curr_password
+        guess, elapsed_time = self.crack.dictionary_attack(curr_password)
+
+        if guess is None:
+            print(f"Password not cracked in 90 seconds")
+            response = messagebox.askquestion("Dictionary Attack", f"Password not cracked in 90 seconds! Try again?")
+
+            if response == 'yes':
+                self.dictionary_attack()
+            else:
+                print("Dictionary Attack expired")
+        else:
+            print(f"Password cracked: {guess} in {elapsed_time} seconds")
+            response = messagebox.askquestion("Dictionary Attack", f"Password cracked: {guess} in {elapsed_time} seconds, Try again?")
+
+            if response == 'yes':
+                self.dictionary_attack()
+            else:
+                print("Dictionary Attack expired")
 
     def update_label(self):
         global current_user
